@@ -1,0 +1,25 @@
+# Build artifacts
+build/
+bin/
+*.user
+*.autosave
+*.pro.user*
+*.qmlproject.user*
+*.o
+*.a
+*.so
+*.so.*
+*.dll
+*.exe
+*.dylib
+
+# IDE
+.vscode/
+.idea/
+*.pro.user
+
+# Runtime
+faces.db
+*.log
+.DS_Store
+Thumbs.db
