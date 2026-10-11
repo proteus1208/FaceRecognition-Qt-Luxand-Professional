@@ -14,10 +14,6 @@ class FaceDatabase;
 class LuxandFaceEngine;
 class RecognitionWorker;
 
-namespace Ui {
-class MainWindow;
-}
-
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -41,7 +37,6 @@ private:
     void createMenuBar();
     void initializeComponents();
 
-    Ui::MainWindow *ui;
     std::unique_ptr<CameraHandler> webcamHandler_;
     std::unique_ptr<IPCameraHandler> ipCameraHandler_;
     std::unique_ptr<FaceDatabase> database_;

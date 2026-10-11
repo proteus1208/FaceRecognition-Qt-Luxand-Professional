@@ -12,7 +12,6 @@ int main(int argc, char *argv[])
 
     app.setApplicationName("Face Recognition System");
     app.setApplicationVersion("1.0.0");
-    app.setApplicationAuthor("Professional Development");
 
     Logger::info("Application started");
 

@@ -3,12 +3,13 @@
 
 #include <QCameraInfo>
 #include <QDebug>
+#include <QVideoFrame>
 
 CameraHandler::CameraHandler(QObject *parent)
     : QObject(parent),
       camera_(nullptr),
-      imageCapture_(nullptr),
-      captureTimer_(nullptr)
+      captureSession_(nullptr),
+      videoSink_(nullptr)
 {
 }
 
@@ -33,18 +34,16 @@ bool CameraHandler::startWebcam(int cameraIndex)
     }
 
     camera_ = new QCamera(cameras.at(cameraIndex), this);
-    imageCapture_ = new QCameraImageCapture(camera_, this);
-    imageCapture_->setCaptureDestination(QCameraImageCapture::CaptureToBuffer);
+    captureSession_ = new QMediaCaptureSession(this);
+    captureSession_->setCamera(camera_);
 
-    connect(imageCapture_, QOverload<int, const QImage &>::of(&QCameraImageCapture::imageCaptured),
-            this, &CameraHandler::onImageCaptured);
+    videoSink_ = new QVideoSink(this);
+    captureSession_->setVideoOutput(videoSink_);
 
-    camera_->setCaptureMode(QCamera::CaptureStillImage);
+    connect(videoSink_, &QVideoSink::videoFrameReceived,
+            this, &CameraHandler::onVideoFrameReceived);
+
     camera_->start();
-
-    captureTimer_ = new QTimer(this);
-    connect(captureTimer_, &QTimer::timeout, this, &CameraHandler::captureFrame);
-    captureTimer_->start(200); // 5 FPS
 
     Logger::info(QString("Webcam %1 started").arg(cameraIndex));
     return true;
@@ -52,35 +51,32 @@ bool CameraHandler::startWebcam(int cameraIndex)
 
 void CameraHandler::stop()
 {
-    if (captureTimer_) {
-        captureTimer_->stop();
-        captureTimer_->deleteLater();
-        captureTimer_ = nullptr;
-    }
-
     if (camera_) {
         camera_->stop();
         camera_->deleteLater();
         camera_ = nullptr;
     }
 
-    if (imageCapture_) {
-        imageCapture_->deleteLater();
-        imageCapture_ = nullptr;
+    if (captureSession_) {
+        captureSession_->deleteLater();
+        captureSession_ = nullptr;
+    }
+
+    if (videoSink_) {
+        videoSink_->deleteLater();
+        videoSink_ = nullptr;
     }
 
     Logger::info("Camera stopped");
 }
 
-void CameraHandler::onImageCaptured(int id, const QImage &preview)
+void CameraHandler::onVideoFrameReceived(const QVideoFrame &frame)
 {
-    latestFrame_ = preview;
-    emit frameReady(preview);
-}
-
-void CameraHandler::captureFrame()
-{
-    if (imageCapture_) {
-        imageCapture_->capture();
+    QVideoFrame clonedFrame = frame;
+    clonedFrame.map(QVideoFrame::ReadOnly);
+    
+    if (clonedFrame.isValid()) {
+        latestFrame_ = clonedFrame.toImage();
+        emit frameReady(latestFrame_);
     }
 }

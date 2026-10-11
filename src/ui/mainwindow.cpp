@@ -1,5 +1,4 @@
 #include "mainwindow.h"
-#include "ui_mainwindow.h"
 
 #include <QVBoxLayout>
 #include <QHBoxLayout>
@@ -21,10 +20,8 @@
 #include "utils/logger.h"
 
 MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent),
-      ui(new Ui::MainWindow)
+    : QMainWindow(parent)
 {
-    ui->setupUi(this);
     setupUI();
     createMenuBar();
     initializeComponents();
@@ -41,7 +38,6 @@ MainWindow::~MainWindow()
     if (ipCameraHandler_) {
         ipCameraHandler_->disconnect();
     }
-    delete ui;
 }
 
 void MainWindow::setupUI()

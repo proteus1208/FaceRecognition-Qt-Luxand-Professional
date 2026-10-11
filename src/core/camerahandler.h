@@ -4,7 +4,8 @@
 #include <QObject>
 #include <QImage>
 #include <QCamera>
-#include <QCameraImageCapture>
+#include <QMediaCaptureSession>
+#include <QVideoSink>
 #include <QTimer>
 
 class CameraHandler : public QObject
@@ -24,13 +25,12 @@ signals:
     void errorOccurred(const QString &error);
 
 private slots:
-    void onImageCaptured(int id, const QImage &preview);
-    void captureFrame();
+    void onVideoFrameReceived(const QVideoFrame &frame);
 
 private:
     QCamera *camera_;
-    QCameraImageCapture *imageCapture_;
-    QTimer *captureTimer_;
+    QMediaCaptureSession *captureSession_;
+    QVideoSink *videoSink_;
     QImage latestFrame_;
 };
 

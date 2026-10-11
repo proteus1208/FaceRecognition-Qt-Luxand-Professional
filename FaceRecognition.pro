@@ -44,8 +44,6 @@ HEADERS += \
     src/utils/logger.h \
     src/utils/configmanager.h
 
-FORMS += src/ui/mainwindow.ui
-
 RESOURCES += resources/resources.qrc
 
 # Luxand FaceSDK configuration (Windows example)
